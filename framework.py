@@ -6,7 +6,7 @@ class Framework:
     def __init__(self, player_1_exec, player_2_exec):
         '''
         Initialization method. It creates a new board, receives the execution code for the two players.
-        :return:
+        :return: None
         '''
 
         # Create a board of 10 x 8
@@ -27,6 +27,10 @@ class Framework:
 
 
     def run_next_turn(self):
+        '''
+        Executes the current players executable with the board game and returns the results to the judge
+        :return: -1 if error or CompletedProcess if sucessful
+        '''
 
         # Prepare data for subprocess call
         current_player = str(self.players[self.whos_turn])
