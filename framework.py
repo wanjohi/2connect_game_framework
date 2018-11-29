@@ -84,29 +84,30 @@ class Framework:
         '''
 
         # Get the players move
-        print(self.turn_results.stdout)
         players_move = self.turn_results.stdout.splitlines()[-1]
         players_column = int(players_move.split(",")[1]) - 1 # make it an array index
         players_color = players_move.split(",")[0]
 
         # Make sure the move is within the board limits
-        if players_column > self.board_columns:
+        if players_column > self.board_columns - 1:
             return False
 
         # Make sure the move is with the right color
-        if players_color != self.prev_players_color:
+        if players_color != self.prev_players_color and players_color != "g":
+            return False
+
+        # Check if column player want to play in is full
+        if self.board[players_column] is not ".":
             return False
 
         # Play the move, find an empty spot and play the players move
         for row in range(self.board_rows,0,-1):
             index = (row * self.board_columns) - self.board_columns
-            print(index)
             if self.board[players_column + index] is ".":
                 self.board[players_column + index] = players_color
                 break
-            # Check if player is playing on a completed column
-            elif row is 0 and self.board[players_column * row] is not ".":
-                return False
+
+        return True
 
     def judge_board(self):
         '''
@@ -120,7 +121,6 @@ class Framework:
                 # Check backwards
                 if index % 10 > 2:
                     cells = ''.join(self.board[index-3:index+1])
-                    print(cells)
                     if players_regex.search(cells):
                         # found a winner!
                         return cells
@@ -128,7 +128,6 @@ class Framework:
                 # Check upwards
                 if index - 30 > 0:
                     cells = ''.join(self.board[index-30:index+1:10])
-                    print(cells)
                     if players_regex.search(cells):
                         # found a winner!
                         return cells
@@ -136,7 +135,6 @@ class Framework:
                 # Check forward diagonal
                 if index > 29 and index % 10 < self.board_columns - 3:
                     cells = self.board[index-27] + self.board[index-18] + self.board[index-9] + self.board[index]
-                    print(cells)
                     if players_regex.search(cells):
                         # found a winner!
                         return cells
@@ -145,7 +143,6 @@ class Framework:
                 if index > 29 and index % 10 > 3:
                     cells = self.board[index - 27] + self.board[index - 18] + self.board[index - 9] + \
                             self.board[index]
-                    print(cells)
                     if players_regex.search(cells):
                         # found a winner!
                         return cells
@@ -153,7 +150,9 @@ class Framework:
 
         # Check if board has been filled
         if '.' not in self.board:
-            return False
+            return 'draw'
+
+        return None
 
     def print_board(self):
         '''
@@ -177,12 +176,47 @@ class Framework:
 
 
 def main():
-    test_framework = Framework("tester_ai.py", "tester_ai.py",os.getcwd())
-    test_framework.run_next_turn()
-    test_framework.play_players_move()
-    test_framework.print_board()
-    print(test_framework.whos_turn)
-    test_framework.judge_board()
+    ai_list = ["tester_ai.py","tester2_ai.py"]
+
+    for index, first_ai in enumerate(ai_list):
+        for second_ai in ai_list[index:]:
+            if first_ai != second_ai:
+                run_game(first_ai,second_ai)
+
+
+def run_game(first_ai, second_ai):
+    game = Framework(first_ai, second_ai, os.getcwd())
+
+    while True:
+        # Play the next turn and exit loop if ai makes bad move
+        if not game.run_next_turn():
+            print("end turn")
+            break # player loses for failed execution
+
+        # Add move to board
+        if not game.play_players_move():
+            print('bad move')
+            break # player loses for bad move
+
+        # print board so i can see
+        game.print_board()
+
+        # Judge current board
+        judgement = game.judge_board()
+
+        if judgement is None:
+            pass
+        elif judgement == 'draw':
+            pass # it was a draw
+        elif 'b' in judgement:
+            print("Result:", judgement)
+            print("Player 1 wins!!")
+            break
+        elif 'r' in judgement:
+            print("Result:",judgement)
+            print("Player 2 wins!!")
+            break
+
 
 
 if __name__ == "__main__":
