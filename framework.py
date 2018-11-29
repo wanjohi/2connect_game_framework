@@ -63,7 +63,7 @@ class Framework:
         self.write_to_log("call: " + command)
 
         # Execute the ai
-        self.turn_results = run(command, cwd=self.working_directory, timeout=5, capture_output=True, shell=True,
+        self.turn_results = run(command, cwd=self.working_directory, timeout=3, capture_output=True, shell=True,
                                 text=True)
 
         # Write output to log file
