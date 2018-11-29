@@ -210,11 +210,16 @@ def run_game(first_ai, second_ai):
         # Play the next turn and exit loop if ai makes bad move
         if not game.run_next_turn():
             print("end turn")
+            game.write_to_log("Failed to run")
+            game.write_to_log(game.players[game.whos_turn] + " loses!!")
+
             break # player loses for failed execution
 
         # Add move to board
         if not game.play_players_move():
             print('bad move')
+            game.write_to_log("Bad move!")
+            game.write_to_log(game.players[game.whos_turn] + " wins!!")
             break # player loses for bad move
 
         # print board so i can see
