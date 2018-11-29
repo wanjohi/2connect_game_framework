@@ -1,5 +1,6 @@
 import datetime
 import os
+import re
 from subprocess import run
 
 class Framework:
@@ -34,13 +35,16 @@ class Framework:
     def run_next_turn(self):
         '''
         Executes the current players executable with the board game and returns the results to the judge
-        :return: -1 if error
+        :return: False if error
         '''
 
         # Prepare data for subprocess call
         current_player = self.players[self.whos_turn]
         current_board = ','.join(self.board)
         players_color = 'b' if self.whos_turn is 0 else 'r'
+
+        # Save color for playing the move
+        self.prev_players_color = players_color
 
         # check file type
         type = current_player.split(".")[-1]
@@ -68,7 +72,12 @@ class Framework:
 
         return True
 
+
     def play_players_move(self):
+        '''
+        Adds the player's move to the board, making sure we stick within the board size
+        :return: False if error
+        '''
 
         # Get the players move
         players_move = self.turn_results.stdout.splitlines()[-1]
@@ -77,6 +86,10 @@ class Framework:
 
         # Make sure the move is within the board limits
         if players_column > self.board_columns:
+            return False
+
+        # Make sure the move is with the right color
+        if players_color != self.prev_players_color:
             return False
 
         # Play the move, find an empty spot and play the players move
@@ -90,12 +103,63 @@ class Framework:
             elif row is 0 and self.board[players_column * row] is not ".":
                 return False
 
-        print(self.board)
+    def judge_board(self):
+        '''
+        Go through the board and see if there are any winners
+        :return:
+        '''
+        players_regex = re.compile(r"(bbgg|ggbb|bgbg|gbgb|bggb|gbbg|rrgg|ggrr|rgrg|grgr|rggr|grrg)")
+
+        for index, cell in enumerate(self.board):
+            if self.board[index] is not ".":
+                # Check backwards
+                if index % 10 > 3:
+                    cells = ''.join(self.board[index-3:index+1])
+                    print(cells)
+                    if players_regex.search(cells):
+                        # found a winner!
+                        return cells
+                # Check upwards
+                if index - 30 > 0:
+                    cells = ''.join(self.board[index-30:index+1:10])
+                    print(cells)
+                    if players_regex.search(cells):
+                        # found a winner!
+                        return cells
+
+
+        # Check if board has been filled
+        if '.' not in self.board:
+            return False
+
+    def print_board(self):
+        '''
+        prints out the board
+        :return:
+        '''
+        print("| ", end="")
+        for _ in range(self.board_columns):
+            print("- ",end="")
+        for index, cell in enumerate(self.board):
+            if index % 10 == 0:
+                print("| ")
+                print("| ",end="")
+            print(self.board[index],"",end="")
+        print("| ")
+        print("| ", end="")
+        for _ in range(self.board_columns):
+            print("- ",end="")
+        print("|")
+
+
 
 def main():
     test_framework = Framework("tester_ai.py", "tester_ai.py",os.getcwd())
     test_framework.run_next_turn()
     test_framework.play_players_move()
+    test_framework.print_board()
+    print(test_framework.whos_turn)
+    test_framework.judge_board()
 
 
 if __name__ == "__main__":

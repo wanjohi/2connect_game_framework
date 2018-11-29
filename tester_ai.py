@@ -3,9 +3,5 @@ def main():
           "line\n"
           "nonesense")
 
-    print("b,6")
+    print("b,10")
 
-
-
-if __name__ == "__main__":
-    main()
