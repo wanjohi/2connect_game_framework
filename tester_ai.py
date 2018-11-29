@@ -3,5 +3,6 @@ def main():
           "line\n"
           "nonesense")
 
-    print("b,10")
+    print("b,7")
 
+main()

@@ -67,6 +67,10 @@ class Framework:
         if self.turn_results.returncode is not 0:
             return False
 
+        # Player looses if they return nothing
+        if self.turn_results.stdout is '':
+            return False
+
         # Set the next players turn
         self.whos_turn = (self.whos_turn + 1) % 2
 
@@ -80,6 +84,7 @@ class Framework:
         '''
 
         # Get the players move
+        print(self.turn_results.stdout)
         players_move = self.turn_results.stdout.splitlines()[-1]
         players_column = int(players_move.split(",")[1]) - 1 # make it an array index
         players_color = players_move.split(",")[0]
@@ -113,15 +118,33 @@ class Framework:
         for index, cell in enumerate(self.board):
             if self.board[index] is not ".":
                 # Check backwards
-                if index % 10 > 3:
+                if index % 10 > 2:
                     cells = ''.join(self.board[index-3:index+1])
                     print(cells)
                     if players_regex.search(cells):
                         # found a winner!
                         return cells
+
                 # Check upwards
                 if index - 30 > 0:
                     cells = ''.join(self.board[index-30:index+1:10])
+                    print(cells)
+                    if players_regex.search(cells):
+                        # found a winner!
+                        return cells
+
+                # Check forward diagonal
+                if index > 29 and index % 10 < self.board_columns - 3:
+                    cells = self.board[index-27] + self.board[index-18] + self.board[index-9] + self.board[index]
+                    print(cells)
+                    if players_regex.search(cells):
+                        # found a winner!
+                        return cells
+
+                # Check backward diagonal
+                if index > 29 and index % 10 > 3:
+                    cells = self.board[index - 27] + self.board[index - 18] + self.board[index - 9] + \
+                            self.board[index]
                     print(cells)
                     if players_regex.search(cells):
                         # found a winner!
