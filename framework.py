@@ -89,7 +89,7 @@ class Framework:
         players_color = players_move.split(",")[0]
 
         # Make sure the move is within the board limits
-        if players_column > self.board_columns - 1:
+        if players_column > self.board_columns - 1 or players_color < 0:
             return False
 
         # Make sure the move is with the right color
