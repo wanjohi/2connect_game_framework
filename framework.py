@@ -43,6 +43,9 @@ class Framework:
         current_board = ','.join(self.board)
         players_color = 'b' if self.whos_turn is 0 else 'r'
 
+        # Write who's playing into log
+        self.write_to_log(self.players[self.whos_turn])
+
         # Save color for playing the move
         self.prev_players_color = players_color
 
@@ -56,12 +59,15 @@ class Framework:
         else:
             command = current_player + " " + players_color + " " + current_board
 
+        # Write commands into log
+        self.write_to_log("call: " + command)
+
         # Execute the ai
         self.turn_results = run(command, cwd=self.working_directory, timeout=5, capture_output=True, shell=True,
                                 text=True)
 
         # Write output to log file
-        self.log_file.write(self.turn_results.stdout)
+        self.write_to_log("output: " + self.turn_results.stdout)
 
         # Player looses if the return code is not 0
         if self.turn_results.returncode is not 0:
@@ -89,7 +95,7 @@ class Framework:
         players_color = players_move.split(",")[0]
 
         # Make sure the move is within the board limits
-        if players_column > self.board_columns - 1 or players_color < 0:
+        if players_column > self.board_columns - 1 or players_column < 0:
             return False
 
         # Make sure the move is with the right color
@@ -107,6 +113,8 @@ class Framework:
                 self.board[players_column + index] = players_color
                 break
 
+        # Draw board into log
+        self.write_to_log(self.print_board())
         return True
 
     def judge_board(self):
@@ -159,19 +167,30 @@ class Framework:
         prints out the board
         :return:
         '''
-        print("| ", end="")
-        for _ in range(self.board_columns):
-            print("- ",end="")
+
+        board_buffer = ''
         for index, cell in enumerate(self.board):
             if index % 10 == 0:
-                print("| ")
-                print("| ",end="")
-            print(self.board[index],"",end="")
-        print("| ")
-        print("| ", end="")
-        for _ in range(self.board_columns):
-            print("- ",end="")
-        print("|")
+                if index is not 0:
+                    board_buffer = board_buffer + "| \n"
+                board_buffer = board_buffer + "| "
+            else:
+                board_buffer = board_buffer + self.board[index] + " "
+        board_buffer = board_buffer + "| \n"
+
+        print(board_buffer)
+        return board_buffer
+
+    def write_to_log(self, buffer):
+        '''
+        Writes buffer into the log file
+        :param buffer: buffer to write
+        :return: None
+        '''
+
+        self.log_file.write("\n")
+        self.log_file.write(buffer)
+        self.log_file.write("\n")
 
 
 
@@ -207,14 +226,19 @@ def run_game(first_ai, second_ai):
         if judgement is None:
             pass
         elif judgement == 'draw':
+            game.write_to_log("It was a draw!")
             pass # it was a draw
         elif 'b' in judgement:
             print("Result:", judgement)
+            game.write_to_log("Result: " + judgement)
             print("Player 1 wins!!")
+            game.write_to_log("Player 1 wins!!")
             break
         elif 'r' in judgement:
             print("Result:",judgement)
+            game.write_to_log("Result: " + judgement)
             print("Player 2 wins!!")
+            game.write_to_log("Player 2 wins!!")
             break
 
 

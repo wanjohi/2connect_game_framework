@@ -1,8 +1,5 @@
 import random
 def main():
-    print("multi\n"
-          "line\n"
-          "nonesense")
 
     column = random.randint(1,10)
 
