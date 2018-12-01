@@ -80,7 +80,7 @@ def save_logs_to_s3(bucket, log_name):
 def save_game_log_db(conn, won_id, lost_id, is_draw,log_link):
 
 
-    s3_link = 'http://{}.s3.amazonaws.com/'.format(os.environ["s3_bucket"]) + log_link
+    s3_link = 'https://{}.s3.amazonaws.com/'.format(os.environ["s3_bucket"]) + log_link
 
     print("Saving data:", won_id, lost_id, is_draw, s3_link)
 
@@ -88,7 +88,7 @@ def save_game_log_db(conn, won_id, lost_id, is_draw,log_link):
 
     with conn.cursor(pymysql.cursors.DictCursor) as cur:
         try:
-            cur.execute(sql,(won_id,lost_id,is_draw,log_link))
+            cur.execute(sql,(won_id,lost_id,is_draw,s3_link))
             conn.commit()
         except:
             print(cur._last_executed)
