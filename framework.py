@@ -26,7 +26,8 @@ class Framework:
 
         # Create a log file for the current game
         now = datetime.datetime.now()
-        self.log_file_name = now.strftime("%Y-%m-%d-%H-%M") + "-"+ player_1_exec + "-" + player_2_exec +  ".log"
+        self.log_file_name = working_directory + now.strftime("%Y-%m-%d-%H-%M") + "-"+ player_1_exec + "-" + \
+                             player_2_exec +  ".log"
 
         self.log_file = open(self.log_file_name, "a")
 
