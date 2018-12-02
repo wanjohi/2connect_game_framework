@@ -92,6 +92,11 @@ class Framework:
 
         # Get the players move
         players_move = self.turn_results.stdout.splitlines()[-1]
+
+        # Make sure the string structure is correct
+        if not re.search('^(r|b|g),\d\d?$', players_move):
+            return False
+
         players_column = int(players_move.split(",")[1]) - 1 # make it an array index
         players_color = players_move.split(",")[0]
 
@@ -205,7 +210,8 @@ def main():
 
 
 def run_game(first_ai, second_ai):
-    game = Framework(first_ai, second_ai, os.getcwd())
+    game = Framework(first_ai, second_ai, os.getcwd() + "/")
+    print(game.log_file_name)
 
     while True:
         # Play the next turn and exit loop if ai makes bad move
