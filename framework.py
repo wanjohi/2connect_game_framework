@@ -5,7 +5,7 @@ from subprocess import run
 
 class Framework:
 
-    def __init__(self, player_1_exec, player_2_exec, working_directory):
+    def __init__(self, player_1, player_2, working_directory):
         '''
         Initialization method. It creates a new board, receives the execution code for the two players.
         :return: None
@@ -18,7 +18,7 @@ class Framework:
         self.board = ['.'] * self.board_columns * self.board_rows
 
         # Set up the players
-        self.players = [player_1_exec, player_2_exec]
+        self.players = [working_directory + player_1["filename"], working_directory + player_2["filename"]]
         self.working_directory = working_directory
 
         # Set up next turn where 0 is player 1 and 1 is player 2
@@ -26,8 +26,8 @@ class Framework:
 
         # Create a log file for the current game
         now = datetime.datetime.now()
-        self.log_file_name = working_directory + now.strftime("%Y-%m-%d-%H-%M") + "-"+ player_1_exec + "-" + \
-                             player_2_exec +  ".log"
+        self.log_file_name = working_directory + now.strftime("%Y-%m-%d-%H-%M") + "-"+ player_1["filename"] + "-" + \
+                             player_2["filename"] +  ".log"
 
         self.log_file = open(self.log_file_name, "a")
 
@@ -45,7 +45,7 @@ class Framework:
         players_color = 'b' if self.whos_turn is 0 else 'r'
 
         # Write who's playing into log
-        self.write_to_log(self.players[self.whos_turn])
+        self.write_to_log(current_player)
 
         # Save color for playing the move
         self.prev_players_color = players_color
@@ -69,6 +69,7 @@ class Framework:
 
         # Write output to log file
         self.write_to_log("output: " + self.turn_results.stdout)
+        self.write_to_log(self.turn_results.stderr)
 
         # Player looses if the return code is not 0
         if self.turn_results.returncode is not 0:
@@ -180,8 +181,7 @@ class Framework:
                 if index is not 0:
                     board_buffer = board_buffer + "| \n"
                 board_buffer = board_buffer + "| "
-            else:
-                board_buffer = board_buffer + self.board[index] + " "
+            board_buffer = board_buffer + self.board[index] + " "
         board_buffer = board_buffer + "| \n"
 
         print(board_buffer)
@@ -201,7 +201,7 @@ class Framework:
 
 
 def main():
-    ai_list = ["tester_ai.py","tester2_ai.py"]
+    ai_list = ["tester_ai.py","simba_ai"]
 
     for index, first_ai in enumerate(ai_list):
         for second_ai in ai_list[index:]:
