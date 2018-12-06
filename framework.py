@@ -138,6 +138,7 @@ class Framework:
                     cells = ''.join(self.board[index-3:index+1])
                     if players_regex.search(cells):
                         # found a winner!
+                        self.write_to_log("Horizontal win on column: " + str(index%10))
                         return cells
 
                 # Check upwards
@@ -145,6 +146,7 @@ class Framework:
                     cells = ''.join(self.board[index-30:index+1:10])
                     if players_regex.search(cells):
                         # found a winner!
+                        self.write_to_log("Vertical win on column: " + str(index%10))
                         return cells
 
                 # Check forward diagonal
@@ -152,6 +154,7 @@ class Framework:
                     cells = self.board[index-27] + self.board[index-18] + self.board[index-9] + self.board[index]
                     if players_regex.search(cells):
                         # found a winner!
+                        self.write_to_log("Forward diagonal win on column: " + str(index%10))
                         return cells
 
                 # Check backward diagonal
@@ -160,6 +163,7 @@ class Framework:
                             self.board[index]
                     if players_regex.search(cells):
                         # found a winner!
+                        self.write_to_log("Backward diagonal win on column: " + str(index%10))
                         return cells
 
 
@@ -201,7 +205,12 @@ class Framework:
 
 
 def main():
-    ai_list = ["tester_ai.py","simba_ai"]
+    player_1 = {}
+    player_2 = {}
+
+    player_1['filename'] = "tester_ai.py"
+    player_2['filename'] = "simba"
+    ai_list = [player_1,player_2]
 
     for index, first_ai in enumerate(ai_list):
         for second_ai in ai_list[index:]:
