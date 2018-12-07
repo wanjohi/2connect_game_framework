@@ -1,7 +1,7 @@
 import datetime
 import os
 import re
-from subprocess import run
+from subprocess import run, TimeoutExpired
 
 class Framework:
 
@@ -64,8 +64,12 @@ class Framework:
         self.write_to_log("call: " + command)
 
         # Execute the ai
-        self.turn_results = run(command, cwd=self.working_directory, timeout=3, capture_output=True, shell=True,
-                                text=True)
+        try:
+            self.turn_results = run(command, cwd=self.working_directory, timeout=20, capture_output=True, shell=True,
+                                    text=True)
+        except TimeoutExpired:
+            self.write_to_log("Player timed out!")
+            return
 
         # Write output to log file
         self.write_to_log("output: " + self.turn_results.stdout)
@@ -143,7 +147,7 @@ class Framework:
 
                 # Check upwards
                 if index - 30 > 0:
-                    cells = ''.join(self.board[index-30:index+1:10])
+                    cells = ''.join(self.board[index-30:index+10:10])
                     if players_regex.search(cells):
                         # found a winner!
                         self.write_to_log("Vertical win on column: " + str(index%10))
@@ -158,8 +162,8 @@ class Framework:
                         return cells
 
                 # Check backward diagonal
-                if index > 29 and index % 10 > 3:
-                    cells = self.board[index - 27] + self.board[index - 18] + self.board[index - 9] + \
+                if index > 29 and index % 10 > 2:
+                    cells = self.board[index - 33] + self.board[index - 22] + self.board[index - 11] + \
                             self.board[index]
                     if players_regex.search(cells):
                         # found a winner!
@@ -239,7 +243,7 @@ def run_game(first_ai, second_ai):
             break # player loses for bad move
 
         # print board so i can see
-        game.print_board()
+        # game.print_board()
 
         # Judge current board
         judgement = game.judge_board()
