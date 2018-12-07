@@ -117,3 +117,5 @@ dmypy.json
 .pyre/
 
 game_framework.zip
+simba
+.vscode/
