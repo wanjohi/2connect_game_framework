@@ -65,7 +65,7 @@ class Framework:
 
         # Execute the ai
         try:
-            self.turn_results = run(command, cwd=self.working_directory, timeout=20, capture_output=True, shell=True,
+            self.turn_results = run(command, cwd=self.working_directory, timeout=10, capture_output=True, shell=True,
                                     text=True)
         except TimeoutExpired:
             self.write_to_log("Player timed out!")
