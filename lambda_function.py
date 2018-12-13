@@ -5,6 +5,7 @@ import botocore
 import pymysql
 from subprocess import run
 from framework import Framework
+from datetime import datetime
 
 # Get environment variables
 mysql_host = os.environ["mysql_host"]
@@ -84,13 +85,15 @@ def save_game_log_db(conn, won_id, lost_id, is_draw,log_link):
 
     s3_link = 'https://{}.s3.amazonaws.com/'.format(os.environ["s3_bucket"]) + log_link
 
+    now = datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
+
     print("Saving data:", won_id, lost_id, is_draw, s3_link)
 
-    sql = "INSERT INTO game_log (ai_won_id, ai_lost_id, is_draw, log_link) VALUES (%s, %s, %s, %s)"
+    sql = "INSERT INTO game_log (timestamp, ai_won_id, ai_lost_id, is_draw, log_link) VALUES (%s, %s, %s, %s, %s)"
 
     with conn.cursor(pymysql.cursors.DictCursor) as cur:
         try:
-            cur.execute(sql,(won_id,lost_id,is_draw,s3_link))
+            cur.execute(sql,(now,won_id,lost_id,is_draw,s3_link))
             conn.commit()
         except:
             print(cur._last_executed)

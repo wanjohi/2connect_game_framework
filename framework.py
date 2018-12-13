@@ -212,8 +212,8 @@ def main():
     player_1 = {}
     player_2 = {}
 
-    player_1['filename'] = "tester_ai.py"
-    player_2['filename'] = "simba"
+    player_1['filename'] = "simba"
+    player_2['filename'] = "simba1"
     ai_list = [player_1,player_2]
 
     for index, first_ai in enumerate(ai_list):
@@ -252,7 +252,7 @@ def run_game(first_ai, second_ai):
             pass
         elif judgement == 'draw':
             game.write_to_log("It was a draw!")
-            pass # it was a draw
+            break # it was a draw
         elif 'b' in judgement:
             print("Result:", judgement)
             game.write_to_log("Result: " + judgement)
